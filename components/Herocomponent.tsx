@@ -19,7 +19,7 @@ function HeroComponent() {
         <Carousel
           showThumbs={false}
           // autoPlay
-          // interval={2 500}
+          // interval={2000}  // remove after coding done
           infiniteLoop
           showArrows={false}
           showStatus={false}
