@@ -63,7 +63,7 @@ export async function scrapeAmazonProduct(url: string) {
 
     const stars = $(".a-icon-alt").text().trim().slice(0, 3);
 
-    const reviewCount = $("#acrCustomerReviewText").text().trim();
+    const reviewsCount = $("#acrCustomerReviewText").text().trim();
 
     const description = extractDescription($);
 
@@ -76,12 +76,12 @@ export async function scrapeAmazonProduct(url: string) {
       originalPrice: Number(originalPrice) || Number(currentPrice),
       discountRate: Number(discountRate),
       outOfStock,
-      stars,
-      reviewCount,
+      stars: Number(stars) || 0,
+      reviewsCount,
       priceHistory: [],
       lowestPrice: Number(currentPrice) || Number(originalPrice),
       highestPrice: Number(originalPrice) || Number(currentPrice),
-      average: Number(currentPrice) || Number(originalPrice),
+      averagePrice: Number(currentPrice) || Number(originalPrice),
       description,
     };
 
