@@ -1,6 +1,6 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
-import { extractPrice } from "../utils";
+import { extractDescription, extractPrice } from "../utils";
 
 export async function scrapeAmazonProduct(url: string) {
   if (!url) return;
@@ -25,6 +25,9 @@ export async function scrapeAmazonProduct(url: string) {
 
     //Cheerio is a library that allows you to work with HTML more conveniently. You can load HTML into Cheerio and then use its methods to find elements and extract information.
     const $ = cheerio.load(response.data);
+
+    //fetch data from amazon website...
+
     const title = $("#productTitle").text().trim();
 
     const currentPrice = extractPrice(
@@ -34,15 +37,7 @@ export async function scrapeAmazonProduct(url: string) {
       $(".a-price aok-align-center reinventPricePriceToPayMargin priceToPay")
     );
 
-    const realPrice = extractPrice(
-      //   $(".a-price a-text-price"),
-      //   $(".a-offscreen"),
-      //   $("#a-offscreen"),
-      //   $("#a-size-small aok-offscreen"),
-      //   $("#a-size-small a-color-secondary aok-align-center basisPrice"),
-      //   $("#a-size-small aok-align-center basisPriceLegalMessage"),
-      //   $("#aok-relative"),
-      //   $("#a-size-small aok-offscreen"),
+    const originalPrice = extractPrice(
       $("#priceblock_ourprice"),
       $(".a-price.a-text-price span.a-offscreen"),
       $("#listPrice"),
@@ -50,19 +45,7 @@ export async function scrapeAmazonProduct(url: string) {
       $(".a-size-base.a-color-price")
     );
 
-    const outOfStock = (realPrice && currentPrice) === "";
-    // Class base code not working.....  :(
-
-    // $(".a-size-medium a-color-success").text().trim().toLowerCase() ===
-    //   "currently unavailable" ||
-    // $(".availability span").text().trim().toLowerCase() ===
-    //   "currently unavailable" ||
-    // $("#availability_feature_div").text().trim().toLowerCase() ===
-    //   "currently unavailable" ||
-    // $("span a-section a-spacing-base a-spacing-top-micro")
-    //   .text()
-    //   .trim()
-    //   .toLowerCase() === "currently unavailable";
+    const outOfStock = (originalPrice && currentPrice) === "";
 
     const images =
       $("#imgBlkFront").attr("data-a-dynamic-image") ||
@@ -82,20 +65,27 @@ export async function scrapeAmazonProduct(url: string) {
 
     const reviewCount = $("#acrCustomerReviewText").text().trim();
 
+    const description = extractDescription($);
+
     const data = {
       url,
       currency: currencySymbol || "$",
       image: imageUrls[0],
       title,
-      currentPrice: Number(currentPrice),
-      originalPrice: Number(realPrice),
+      currentPrice: Number(currentPrice) || Number(originalPrice),
+      originalPrice: Number(originalPrice) || Number(currentPrice),
       discountRate: Number(discountRate),
       outOfStock,
       stars,
       reviewCount,
+      priceHistory: [],
+      lowestPrice: Number(currentPrice) || Number(originalPrice),
+      highestPrice: Number(originalPrice) || Number(currentPrice),
+      average: Number(currentPrice) || Number(originalPrice),
+      description,
     };
 
-    console.log(data);
+    return data;
   } catch (error: any) {
     throw new Error(
       `Failed to Scrape Product from Scraper scrapeAmazonProduct Function: ${error.message} `
