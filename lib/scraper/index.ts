@@ -2,8 +2,6 @@ import axios from "axios";
 import * as cheerio from "cheerio";
 import { extractPrice } from "../utils";
 
-// curl -i --proxy brd.superproxy.io:22225 --proxy-user brd-customer-hl_91750c13-zone-pricewise:sy5ncd7mw41o -k "https://geo.brdtest.com/welcome.txt"
-
 export async function scrapeAmazonProduct(url: string) {
   if (!url) return;
 
@@ -52,7 +50,7 @@ export async function scrapeAmazonProduct(url: string) {
       $(".a-size-base.a-color-price")
     );
 
-    const outOfStock = realPrice || currentPrice === "";
+    const outOfStock = (realPrice && currentPrice) === "";
     // Class base code not working.....  :(
 
     // $(".a-size-medium a-color-success").text().trim().toLowerCase() ===
@@ -66,7 +64,38 @@ export async function scrapeAmazonProduct(url: string) {
     //   .trim()
     //   .toLowerCase() === "currently unavailable";
 
-    console.log({ title, currentPrice, realPrice, outOfStock });
+    const images =
+      $("#imgBlkFront").attr("data-a-dynamic-image") ||
+      $("#landingImage").attr("data-a-dynamic-image") ||
+      "{}";
+
+    const imageUrls = Object.keys(JSON.parse(images));
+
+    const currencySymbol = $(".a-price-symbol").text().trim().slice(0, 1);
+
+    const discountRate = $(".savingsPercentage")
+      .text()
+      .trim()
+      .replace(/[-%]/g, "");
+
+    const stars = $(".a-icon-alt").text().trim().slice(0, 3);
+
+    const reviewCount = $("#acrCustomerReviewText").text().trim();
+
+    const data = {
+      url,
+      currency: currencySymbol || "$",
+      image: imageUrls[0],
+      title,
+      currentPrice: Number(currentPrice),
+      originalPrice: Number(realPrice),
+      discountRate: Number(discountRate),
+      outOfStock,
+      stars,
+      reviewCount,
+    };
+
+    console.log(data);
   } catch (error: any) {
     throw new Error(
       `Failed to Scrape Product from Scraper scrapeAmazonProduct Function: ${error.message} `
