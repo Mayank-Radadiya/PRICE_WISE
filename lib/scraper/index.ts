@@ -52,20 +52,20 @@ export async function scrapeAmazonProduct(url: string) {
       $(".a-size-base.a-color-price")
     );
 
-    const outOfStock = $("#a-size-medium a-color-success").text()
-        // $(".availability span").text().trim().toLowerCase() 
-      //   $(".a-size-medium a-color-success").text().trim().toLowerCase() ===
-      //     "currently unavailable" ||
-      //   $(".a-declarative").text().trim().toLowerCase() ===
-      //     "currently unavailable" ||
-      //   $("#availability_feature_div").text().trim().toLowerCase() ===
-      //     "currently unavailable" ||
-    //   $("span a-section a-spacing-base a-spacing-top-micro")
-    //     .text()
-    //     .trim()
-    //     .toLowerCase() === "currently unavailable";
+    const outOfStock = realPrice || currentPrice === "";
+    // Class base code not working.....  :(
 
-    //
+    // $(".a-size-medium a-color-success").text().trim().toLowerCase() ===
+    //   "currently unavailable" ||
+    // $(".availability span").text().trim().toLowerCase() ===
+    //   "currently unavailable" ||
+    // $("#availability_feature_div").text().trim().toLowerCase() ===
+    //   "currently unavailable" ||
+    // $("span a-section a-spacing-base a-spacing-top-micro")
+    //   .text()
+    //   .trim()
+    //   .toLowerCase() === "currently unavailable";
+
     console.log({ title, currentPrice, realPrice, outOfStock });
   } catch (error: any) {
     throw new Error(
