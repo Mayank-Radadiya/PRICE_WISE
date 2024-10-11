@@ -26,7 +26,7 @@ const isValidURlAmazonLink = (url: string) => {
   return false;
 };
 
- function Searchbar() {
+function Searchbar() {
   const [searchPrompt, setSearchPrompt] = useState("");
   const [Loading, setLoading] = useState(false);
 
@@ -60,7 +60,7 @@ const isValidURlAmazonLink = (url: string) => {
           onChange={(e) => setSearchPrompt(e.target.value)}
           value={searchPrompt}
         />
-        <button 
+        <button
           disabled={searchPrompt === ""}
           type="submit"
           className="searchbar-btn"

@@ -27,7 +27,7 @@ export async function scrapeAndStoreProduct(url: string) {
         { price: scrapeProduct.currentPrice },
       ];
 
-      const product = {
+      product = {
         ...scrapeProduct,
         priceHistory: UpdatedPriceHistory,
         lowestPrice: getLowestPrice(UpdatedPriceHistory),
@@ -41,8 +41,17 @@ export async function scrapeAndStoreProduct(url: string) {
       product,
       { upsert: true, new: true }
     );
+
     revalidatePath(`/product/${newProduct._id}`);
   } catch (error: any) {
     throw new Error(`Failed to Create/Update Product : ${error.message} `);
+  }
+}
+
+export async function GetProductBtId(productId:string) {
+  try {
+    
+  } catch (error) {
+    
   }
 }
