@@ -7,6 +7,12 @@ import React from "react";
 
 async function Home() {
   const allProductsList = await GetAllProducts();
+
+  function getRandomProducts(products: any, limit: number) {
+    return products
+      .sort(() => 0.5 - Math.random()) // Shuffle the array randomly
+      .slice(0, limit); // Take the first `limit` items
+  }
   return (
     <>
       <section className="px-6 md:px-20 py-24">
@@ -43,7 +49,7 @@ async function Home() {
         <h2 className="section-text">Trending</h2>
 
         <div className="flex flex-wrap gap-x-8 gap-y-16">
-          {allProductsList?.map((product) => (
+          {getRandomProducts(allProductsList, 12).map((product: any) => (
             <ProductCard key={product._id} product={product} />
           ))}
         </div>

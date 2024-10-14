@@ -1,4 +1,4 @@
-import { GetProductBtId } from "@/lib/actions";
+import { GetProductBtId, GetSimilarProducts } from "@/lib/actions";
 import { Product } from "@/types";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatNumber } from "@/lib/utils";
 import PriceInfoCard from "@/components/PriceInfoCard";
+import ProductCard from "@/components/ProductCard";
 
 type props = {
   params: { id: string };
@@ -17,6 +18,14 @@ async function productDetails({ params: { id } }: props) {
   }
   const product: Product = await GetProductBtId(id);
   if (!product) redirect("/");
+
+  const similarProducts = await GetSimilarProducts(id);
+
+  function getRandomProducts(products: any, limit: number) {
+    return products
+      .sort(() => 0.5 - Math.random()) // Shuffle the array randomly
+      .slice(0, limit); // Take the first `limit` items
+  }
 
   return (
     <div className="product-container">
@@ -37,7 +46,6 @@ async function productDetails({ params: { id } }: props) {
               <p className="text-[28px] text-secondary font-semibold">
                 {product.title}
               </p>
-
               <Link
                 href={product.url}
                 target="_blank"
@@ -168,18 +176,21 @@ async function productDetails({ params: { id } }: props) {
                 )}`}
               />
               <div className="flex flex-col gap-16">
-                <button className="btn w-fit mx-auto flex items-center justify-center gap-3 min-w-[200px]">
-                  <Image
-                    src="/assets/icons/bag.svg"
-                    alt="check"
-                    width={22}
-                    height={22}
-                  />
-
-                  <Link href={product.url} className="text-base text-white">
+                <Link
+                  href={product.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <button className="btn w-fit mx-auto flex items-center justify-center gap-3 min-w-[200px]">
+                    <Image
+                      src="/assets/icons/bag.svg"
+                      alt="check"
+                      width={22}
+                      height={22}
+                    />
                     Buy Now
-                  </Link>
-                </button>
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -188,17 +199,17 @@ async function productDetails({ params: { id } }: props) {
         </div>
       </div>
 
-      {/* {similarProducts && similarProducts?.length > 0 && (
-       <div className="py-14 flex flex-col gap-2 w-full">
-         <p className="section-text">Similar Products</p>
+      {similarProducts && similarProducts?.length > 0 && (
+        <div className="py-14 flex flex-col gap-2 w-full">
+          <p className="section-text">Similar Products</p>
 
-         <div className="flex flex-wrap gap-10 mt-7 w-full">
-           {similarProducts.map((product) => (
-             <ProductCard key={product._id} product={product} />
-           ))}
-         </div>
-       </div>
-     )} */}
+          <div className="flex flex-wrap gap-10 mt-7 w-full">
+            {getRandomProducts(similarProducts, 3).map((product: any) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
