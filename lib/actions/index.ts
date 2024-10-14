@@ -48,10 +48,29 @@ export async function scrapeAndStoreProduct(url: string) {
   }
 }
 
-export async function GetProductBtId(productId:string) {
+export async function GetProductBtId(productId: string) {
   try {
-    
-  } catch (error) {
-    
+    dbConnection();
+    const product = await Product.findOne({ _id: productId });
+
+    if (!product) return null;
+
+    return product;
+  } catch (error: any) {
+    console.error(error.message);
+  }
+}
+
+export async function GetAllProducts() {
+  try {
+    dbConnection();
+
+    const product = await Product.find();
+
+    if (!product) return null;
+
+    return product;
+  } catch (error: any) {
+    console.error(error.message);
   }
 }

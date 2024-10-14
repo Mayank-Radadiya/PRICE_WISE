@@ -41,7 +41,6 @@ function Searchbar() {
       setLoading(true);
       // Scraping the product page
       const product = await scrapeAndStoreProduct(searchPrompt);
-      console.log(product);
     } catch (error) {
       console.log(error);
       throw error;
