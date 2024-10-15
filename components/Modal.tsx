@@ -20,7 +20,7 @@ function Modal({ productId }: Props) {
     e.preventDefault();
     setIsSubmitting(true);
 
-    await addUserEmailToProduct(productId, email);
+    await addUserEmailToProduct(email ,productId);
 
     setIsSubmitting(false);
     setEmail("");
