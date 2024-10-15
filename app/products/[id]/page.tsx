@@ -7,6 +7,7 @@ import Link from "next/link";
 import { formatNumber } from "@/lib/utils";
 import PriceInfoCard from "@/components/PriceInfoCard";
 import ProductCard from "@/components/ProductCard";
+import Modal from "@/components/Modal";
 
 type props = {
   params: { id: string };
@@ -175,7 +176,9 @@ async function productDetails({ params: { id } }: props) {
                   product.lowestPrice
                 )}`}
               />
-              <div className="flex flex-col gap-16">
+
+              <div className="flex  gap-16">
+                <Modal productId={id} />
                 <Link
                   href={product.url}
                   target="_blank"
@@ -194,8 +197,6 @@ async function productDetails({ params: { id } }: props) {
               </div>
             </div>
           </div>
-
-          {/* <Modal productId={id} /> */}
         </div>
       </div>
 

@@ -5,6 +5,7 @@ import { dbConnection } from "../database/DBconnection";
 import Product from "../models/product.model";
 import { scrapeAmazonProduct } from "../scraper";
 import { getAveragePrice, getHighestPrice, getLowestPrice } from "../utils";
+import exp from "constants";
 
 export async function scrapeAndStoreProduct(url: string) {
   // If url missing return null
@@ -85,9 +86,21 @@ export async function GetSimilarProducts(productId: string) {
 
     const similarProduct = await Product.find({
       _id: { $ne: productId },
-    })
+    });
 
     return similarProduct;
+  } catch (error: any) {
+    console.error(error.message);
+  }
+}
+
+export async function addUserEmailToProduct(email: string, productId: string) {
+  try {
+   dbConnection()
+
+   const product = await Product.findById(productId)
+
+   
   } catch (error: any) {
     console.error(error.message);
   }
