@@ -16,29 +16,28 @@ export const revalidate = 0;
 
 export async function GET(request: Request) {
   try {
-    // Ensure DB connection
-    await dbConnection();
+    dbConnection();
 
-    // Fetch all products (changed from findOne to find)
     const products = await Product.find({});
 
-    if (!products) {
-      throw new Error("No products found");
-    }
+    if (!products) throw new Error("No product fetched");
 
-    // Process all products concurrently
+    // ======================== 1 SCRAPE LATEST PRODUCT DETAILS & UPDATE DB
     const updatedProducts = await Promise.all(
-      products.map(async (currentProduct: any) => {
+      products.map(async (currentProduct) => {
+        // Scrape product
         const scrapedProduct = await scrapeAmazonProduct(currentProduct.url);
 
-        if (!scrapedProduct) return null; // Skip if scraping failed
+        if (!scrapedProduct) return;
 
         const updatedPriceHistory = [
           ...currentProduct.priceHistory,
-          { price: scrapedProduct.currentPrice },
+          {
+            price: scrapedProduct.currentPrice,
+          },
         ];
 
-        const productData = {
+        const product = {
           ...scrapedProduct,
           priceHistory: updatedPriceHistory,
           lowestPrice: getLowestPrice(updatedPriceHistory),
@@ -46,15 +45,15 @@ export async function GET(request: Request) {
           averagePrice: getAveragePrice(updatedPriceHistory),
         };
 
-        // Update product in DB
+        // Update Products in DB
         const updatedProduct = await Product.findOneAndUpdate(
-          { url: currentProduct.url },
-          productData
+          {
+            url: product.url,
+          },
+          product
         );
 
-        if (!updatedProduct) return null;
-
-        // Determine if an email notification is needed
+        // ======================== 2 CHECK EACH PRODUCT'S STATUS & SEND EMAIL ACCORDINGLY
         const emailNotifyType = getEmailNotifyType(
           scrapedProduct,
           currentProduct
@@ -65,19 +64,16 @@ export async function GET(request: Request) {
             title: updatedProduct.title,
             url: updatedProduct.url,
           };
-
-          // Generate email content
+          // Construct emailContent
           const emailContent = await generateEmailBody(
             productInfo,
             emailNotifyType
           );
-
-          // Collect user emails
+          // Get array of user emails
           const userEmails = updatedProduct.users.map(
             (user: any) => user.email
           );
-
-          // Send email notifications
+          // Send email notification
           await sendEmail(emailContent, userEmails);
         }
 
@@ -85,18 +81,11 @@ export async function GET(request: Request) {
       })
     );
 
-    // Filter out null values from the result
-    const successfulUpdates = updatedProducts.filter(Boolean);
-
     return NextResponse.json({
       message: "Ok",
-      data: successfulUpdates,
+      data: updatedProducts,
     });
   } catch (error: any) {
-    console.error("Error in GET function:", error);
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
-    );
+    throw new Error(`Failed to get all products: ${error.message}`);
   }
 }
