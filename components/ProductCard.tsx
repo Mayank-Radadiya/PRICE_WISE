@@ -27,9 +27,9 @@ function ProductCard({ product }: Props) {
 
           <p className="text-black text-lg font-semibold">
             {product.outOfStock == true ? (
-              <h3 className="text-1xl font-semibold text-red-600">
+              <span className="text-1xl font-semibold text-red-600">
                 Out of stock.
-              </h3>
+              </span>
             ) : (
               <>
                 <span>{product?.currency}</span>
