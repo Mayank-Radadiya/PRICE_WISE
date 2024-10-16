@@ -22,7 +22,6 @@ export async function GET(request: Request) {
 
     if (!products) throw new Error("No product fetched");
 
-    // ======================== 1 SCRAPE LATEST PRODUCT DETAILS & UPDATE DB
     const updatedProducts = await Promise.all(
       products.map(async (currentProduct) => {
         // Scrape product
@@ -33,7 +32,7 @@ export async function GET(request: Request) {
         const updatedPriceHistory = [
           ...currentProduct.priceHistory,
           {
-            price: scrapedProduct.currentPrice,
+            price: scrapedProduct?.currentPrice,
           },
         ];
 
@@ -45,7 +44,7 @@ export async function GET(request: Request) {
           averagePrice: getAveragePrice(updatedPriceHistory),
         };
 
-        // Update Products in DB
+        
         const updatedProduct = await Product.findOneAndUpdate(
           {
             url: product.url,
@@ -53,7 +52,7 @@ export async function GET(request: Request) {
           product
         );
 
-        // ======================== 2 CHECK EACH PRODUCT'S STATUS & SEND EMAIL ACCORDINGLY
+        
         const emailNotifyType = getEmailNotifyType(
           scrapedProduct,
           currentProduct
