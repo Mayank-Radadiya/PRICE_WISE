@@ -23,9 +23,6 @@ function ProductCard({ product }:Props) {
          <h3 className="product-title">{product.title}</h3>
 
          <div className="flex justify-between">
-           <p className="text-black opacity-50 text-lg capitalize">
-             {product.category}
-           </p>
 
            <p className="text-black text-lg font-semibold">
              <span>{product?.currency}</span>
