@@ -18,8 +18,8 @@ function HeroComponent() {
       <div className="hero-carousel">
         <Carousel
           showThumbs={false}
-          // autoPlay
-          // interval={2000}  // remove after coding done
+          autoPlay
+          interval={2000}  // remove after coding done
           infiniteLoop
           showArrows={false}
           showStatus={false}
