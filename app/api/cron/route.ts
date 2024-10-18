@@ -10,7 +10,7 @@ import {
 } from "@/lib/utils";
 import { NextResponse } from "next/server";
 
-export const maxDuration = 60; // Function max duration for the hobby plan
+export const maxDuration = 1; // Function max duration for the hobby plan
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
@@ -34,7 +34,7 @@ export async function GET(request: Request) {
           {
             price: scrapedProduct?.currentPrice,
           },
-        ];
+        ]; 
 
         const product = {
           ...scrapedProduct,
@@ -79,7 +79,8 @@ export async function GET(request: Request) {
         return updatedProduct;
       })
     );
-
+    console.log(updatedProducts);
+    
     return NextResponse.json({
       message: "Ok",
       data: updatedProducts,
