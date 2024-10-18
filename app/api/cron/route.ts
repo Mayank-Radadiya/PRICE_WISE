@@ -10,7 +10,7 @@ import {
 } from "@/lib/utils";
 import { NextResponse } from "next/server";
 
-export const maxDuration = 1; // Function max duration for the hobby plan
+export const maxDuration = 30; // Function max duration for the hobby plan
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
