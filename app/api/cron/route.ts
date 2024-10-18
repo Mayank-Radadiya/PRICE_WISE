@@ -16,27 +16,40 @@ export const revalidate = 0;
 
 export async function GET(request: Request) {
   try {
-    dbConnection();
+    // Ensure DB connection is established
+    await dbConnection();
 
+    // Fetch all products from the database
     const products = await Product.find({});
 
-    if (!products) throw new Error("No product fetched");
+    if (!products || products.length === 0) {
+      throw new Error("No products found");
+    }
 
+    // Process each product
     const updatedProducts = await Promise.all(
-      products.map(async (currentProduct) => {
-        // Scrape product
+      products.map(async (currentProduct: any) => {
+        // Scrape product details
         const scrapedProduct = await scrapeAmazonProduct(currentProduct.url);
 
-        if (!scrapedProduct) return;
+        if (
+          !scrapedProduct ||
+          typeof scrapedProduct.currentPrice !== "number"
+        ) {
+          console.warn(
+            `Skipping product with URL: ${currentProduct.url} - No valid scraped data`
+          );
+          return null; // Skip if scraping fails or price is not a number
+        }
 
         const updatedPriceHistory = [
           ...currentProduct.priceHistory,
           {
-            price: scrapedProduct?.currentPrice,
+            price: scrapedProduct.currentPrice,
           },
-        ]; 
+        ];
 
-        const product = {
+        const productData = {
           ...scrapedProduct,
           priceHistory: updatedPriceHistory,
           lowestPrice: getLowestPrice(updatedPriceHistory),
@@ -44,15 +57,21 @@ export async function GET(request: Request) {
           averagePrice: getAveragePrice(updatedPriceHistory),
         };
 
-        
+        // Update product in the database
         const updatedProduct = await Product.findOneAndUpdate(
-          {
-            url: product.url,
-          },
-          product
+          { url: currentProduct.url },
+          productData,
+          { new: true } // Return the updated document
         );
 
-        
+        if (!updatedProduct) {
+          console.warn(
+            `Failed to update product with URL: ${currentProduct.url}`
+          );
+          return null; // Skip if update fails
+        }
+
+        // Check if email notification is needed
         const emailNotifyType = getEmailNotifyType(
           scrapedProduct,
           currentProduct
@@ -63,29 +82,39 @@ export async function GET(request: Request) {
             title: updatedProduct.title,
             url: updatedProduct.url,
           };
-          // Construct emailContent
+
+          // Construct the email content
           const emailContent = await generateEmailBody(
             productInfo,
             emailNotifyType
           );
-          // Get array of user emails
+
+          // Get the array of user emails
           const userEmails = updatedProduct.users.map(
             (user: any) => user.email
           );
-          // Send email notification
+
+          // Send the email notification
           await sendEmail(emailContent, userEmails);
         }
 
         return updatedProduct;
       })
     );
-    console.log(updatedProducts);
-    
+
+    // Filter out null values from the result
+    const successfulUpdates = updatedProducts.filter(Boolean);
+
+    // Return the updated products
     return NextResponse.json({
       message: "Ok",
-      data: updatedProducts,
+      data: successfulUpdates,
     });
   } catch (error: any) {
-    throw new Error(`Failed to get all products: ${error.message}`);
+    console.error("Failed to get all products:", error);
+    return NextResponse.json(
+      { message: `Failed to get all products: ${error.message}` },
+      { status: 500 }
+    );
   }
 }
