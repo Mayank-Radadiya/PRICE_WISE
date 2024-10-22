@@ -9,11 +9,12 @@ import PriceInfoCard from "@/components/PriceInfoCard";
 import ProductCard from "@/components/ProductCard";
 import Modal from "@/components/Modal";
 
-type props = {
-  params: { id: string };
-};
+// type props = {
+//   params: { id: string };
+// };
 
-async function productDetails({ params: { id } }: props) {
+async function productDetails({ params: { id } }: any) {
+
   function randomNumber() {
     return Math.floor(Math.random() * (99 - 75 + 1)) + 75;
   }
