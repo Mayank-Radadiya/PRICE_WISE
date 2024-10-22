@@ -13,17 +13,24 @@ import Modal from "@/components/Modal";
 //   params: { id: string };
 // };
 
-async function productDetails({ params: { id } }: any) {
-
+async function productDetails({ params }: any) {
+  const { id } = await params;
+  // Utility to generate a random number between 75 and 99
   function randomNumber() {
     return Math.floor(Math.random() * (99 - 75 + 1)) + 75;
   }
-  const product: Product = await GetProductBtId(id);
+
+  // Fetch product and similar products in parallel
+  const [product, similarProducts] = await Promise.all([
+    GetProductBtId(id),
+    GetSimilarProducts(id),
+  ]);
+
+  // If no product found, redirect to home page
   if (!product) redirect("/");
 
-  const similarProducts = await GetSimilarProducts(id);
-
-  function getRandomProducts(products: any, limit: number) {
+  // Function to shuffle similar products and get the first `limit`
+  function getRandomProducts(products: any[], limit: number) {
     return products
       .sort(() => 0.5 - Math.random()) // Shuffle the array randomly
       .slice(0, limit); // Take the first `limit` items
