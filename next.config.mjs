@@ -1,10 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ["mongoose"],
-  },
+  serverExternalPackages: ["mongoose"], // Moved from experimental
   images: {
-    domains: ["m.media-amazon.com", "images.remotePatterns"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "m.media-amazon.com",
+        pathname: "/**",
+      },
+    ],
   },
 };
 

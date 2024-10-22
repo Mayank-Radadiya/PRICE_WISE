@@ -8,10 +8,10 @@ import React from "react";
 async function Home() {
   const allProductsList = await GetAllProducts();
 
-  function getRandomProducts(products: any, limit: number) {
+  function getRandomProducts(products: any, limit: number = 12) {
     return products
       .sort(() => 0.5 - Math.random()) // Shuffle the array randomly
-      .slice(0, limit); // Take the first `limit` items
+      .slice(-limit); // Take the last `limit` items (default 12)
   }
   return (
     <>
