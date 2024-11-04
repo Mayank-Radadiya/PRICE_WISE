@@ -65,10 +65,9 @@ export async function GetProductBtId(productId: string) {
 }
 
 export async function GetAllProducts() {
+  dbConnection();
   try {
-    dbConnection();
-
-    const product = await Product.find();
+    const product = await Product.find({});
 
     if (!product) return null;
 
@@ -105,8 +104,7 @@ export async function addUserEmailToProduct(
 
     const product = await Product.findById(productId);
     if (!product) return null;
-    
-    
+
     const userExists = product.users.some(
       (user: User) => user.email === userEmail
     );
