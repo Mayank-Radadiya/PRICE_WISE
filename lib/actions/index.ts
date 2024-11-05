@@ -8,6 +8,7 @@ import { getAveragePrice, getHighestPrice, getLowestPrice } from "../utils";
 import exp from "constants";
 import { User } from "@/types";
 import { generateEmailBody, sendEmail } from "../nodemailer";
+import mongoose from "mongoose";
 
 export async function scrapeAndStoreProduct(url: string) {
   // If url missing return null
@@ -65,15 +66,55 @@ export async function GetProductBtId(productId: string) {
 }
 
 export async function GetAllProducts() {
-  dbConnection();
   try {
-    const product = await Product.find({});
+    // Ensure database connection
+    if (mongoose.connection.readyState !== 1) {
+      await dbConnection();
+    }
 
-    if (!product) return null;
+    // Add timeout and increase limit
+    const product = await Product.find({})
+      .limit(1000) // Adjust this number based on your needs
+      .lean(); // Makes query faster by returning plain objects
 
+    if (!product || product.length === 0) {
+      console.log("No products found");
+      return [];
+    }
+
+    console.log(`Found ${product.length} products`);
     return product;
   } catch (error: any) {
-    console.error(error.message);
+    // Enhanced error logging
+    if (error.name === "MongooseServerSelectionError") {
+      console.error("Unable to connect to database:", error.message);
+    } else {
+      console.error("Error fetching products:", {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      });
+    }
+
+    throw new Error(`Failed to fetch products: ${error.message}`);
+  }
+}
+
+// Optional: Add a function to check database connection status
+export async function checkDatabaseConnection() {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      await dbConnection();
+    }
+    return {
+      connected: true,
+      state: mongoose.connection.readyState,
+    };
+  } catch (error: any) {
+    return {
+      connected: false,
+      error: error.message,
+    };
   }
 }
 

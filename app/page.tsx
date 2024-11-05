@@ -8,11 +8,11 @@ import React from "react";
 async function Home() {
   const allProductsList = await GetAllProducts();
 
-  function getRandomProducts(products: any, limit: number = 12) {
-    return products
-      .sort(() => 0.5 - Math.random()) // Shuffle the array randomly
-      .slice(-limit); // Take the last `limit` items (default 12)
+  function getLastAndReverse(arr: any[], limit: number) {
+    return arr.slice(-limit).reverse(); // Take the last `limit` items and reverse them
   }
+
+
   return (
     <>
       <section className="px-6 md:px-20 py-24">
@@ -49,7 +49,7 @@ async function Home() {
         <h2 className="section-text">Trending</h2>
 
         <div className="flex flex-wrap gap-x-8 gap-y-16">
-          {getRandomProducts(allProductsList, 12).map((product: any) => (
+          {getLastAndReverse(allProductsList, 12).map((product: any) => (
             <ProductCard key={product._id} product={product} />
           ))}
         </div>
