@@ -8,7 +8,7 @@ import React from "react";
 async function Home() {
   const allProductsList = await GetAllProducts();
 
-  function getLastAndReverse(arr: any[], limit: number) {
+  function getLastAndReverse(arr: any, limit: number) {
     return arr.slice(-limit).reverse(); // Take the last `limit` items and reverse them
   }
 
