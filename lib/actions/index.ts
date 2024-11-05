@@ -66,39 +66,19 @@ export async function GetProductBtId(productId: string) {
 }
 
 export async function GetAllProducts() {
+  dbConnection();
   try {
-    // Ensure database connection
-    if (mongoose.connection.readyState !== 1) {
-      await dbConnection();
-    }
+    const product = await Product.find({});
 
-    // Add timeout and increase limit
-    const product = await Product.find({})
-      .limit(1000) // Adjust this number based on your needs
-      .lean(); // Makes query faster by returning plain objects
+    if (!product) return null;
+    console.log("Fetched products:", product); // Log to verify data
 
-    if (!product || product.length === 0) {
-      console.log("No products found");
-      return [];
-    }
-
-    console.log(`Found ${product.length} products`);
     return product;
   } catch (error: any) {
-    // Enhanced error logging
-    if (error.name === "MongooseServerSelectionError") {
-      console.error("Unable to connect to database:", error.message);
-    } else {
-      console.error("Error fetching products:", {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-      });
-    }
-
-    throw new Error(`Failed to fetch products: ${error.message}`);
+    console.error(error.message);
   }
 }
+
 
 // Optional: Add a function to check database connection status
 export async function checkDatabaseConnection() {
