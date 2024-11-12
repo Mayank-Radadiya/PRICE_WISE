@@ -68,10 +68,9 @@ export async function GetProductBtId(productId: string) {
 export async function GetAllProducts() {
   dbConnection();
   try {
-    const product = await Product.find({});
+    const product = await Product.find();
 
     if (!product) return null;
-    console.log("Fetched products:", product); // Log to verify data
 
     return product;
   } catch (error: any) {

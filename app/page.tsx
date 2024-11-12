@@ -8,9 +8,9 @@ import React from "react";
 async function Home() {
   const allProductsList = await GetAllProducts();
 
-  // function getLastAndReverse(arr: any, limit: number) {
-  //   return arr?.slice(-limit).reverse(); // Take the last `limit` items and reverse them
-  // }
+  function getLastAndReverse(arr: any, limit: number) {
+    return arr?.slice(-limit).reverse(); // Take the last `limit` items and reverse them
+  }
   
   return (
     <>
@@ -48,10 +48,7 @@ async function Home() {
         <h2 className="section-text">Trending</h2>
 
         <div className="flex flex-wrap gap-x-8 gap-y-16">
-          {/* {getLastAndReverse(allProductsList, 12)?.map((product: any) => (
-            <ProductCard key={product._id} product={product} />
-          ))} */}
-          {allProductsList?.map((product: any) => (
+          {getLastAndReverse(allProductsList, 12)?.map((product: any) => (
             <ProductCard key={product._id} product={product} />
           ))}
         </div>
